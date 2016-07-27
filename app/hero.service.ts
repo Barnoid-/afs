@@ -27,6 +27,54 @@ export class HeroService {
         return this.getHeroes()
             .then(heroes => heroes.find(hero => hero.id === id));
     }
+    
+    private post(hero: Hero): Promise<Hero> {
+        let headers = new Headers({
+            'Content-Type': 'application/json'
+        });
+        
+        return this.http
+            .post(this.heroesUrl, JSON.stringify(hero), {headers: headers})
+            .toPromise()
+            .then(res => res.json().data)
+            .catch(this.handleError);
+    }
+    
+    private put(hero: Hero): Promise<Hero> {
+        let headers = new Headers({
+            'Content-Type': 'application/json'
+        });
+        
+        let url = `${this.heroesUrl}/${hero.id}`;
+        
+        return this.http
+            .put(url, JSON.stringify(hero), {headers: headers})
+            .toPromise()
+            .then(() => hero)
+            .catch(this.handleError);
+    }
+    
+    save(hero: Hero) {
+        if (hero.id) {
+            return this.put(hero);
+        } else {
+            return this.post(hero);
+        }
+    }
+    
+    delete(hero: Hero) {
+        let headers = new Headers({
+            'Content-Type': 'application/json'
+        });
+
+        let url = `${this.heroesUrl}/${hero.id}`;
+
+        return this.http
+            .delete(url, {headers: headers})
+            .toPromise()
+            .then(() => hero)
+            .catch(this.handleError);
+    }
 
     private handleError(error: any) {
         console.error('Cannot get data!', error);
